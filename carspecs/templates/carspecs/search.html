@@ -1,0 +1,102 @@
+{% extends 'carspecs/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}AutoSpecs – Search{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="text-center mb-5">
+    <h1 class="display-5 fw-bold">🚗 AutoSpecs</h1>
+    <p class="text-muted">Search vehicle specifications by Year/Make/Model or VIN</p>
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- Tabs -->
+  <ul class="nav nav-tabs mb-4" id="searchTabs" role="tablist">
+    <li class="nav-item">
+      <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#ymm-tab">
+        Year / Make / Model
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#vin-tab">
+        VIN Search
+      </button>
+    </li>
+  </ul>
+
+  <div class="tab-content">
+    <!-- YMM Search -->
+    <div class="tab-pane fade show active" id="ymm-tab">
+      <div class="card shadow-sm">
+        <div class="card-body p-4">
+          <form method="post" action="{% url 'carspecs:search_ymm' %}">
+            {% csrf_token %}
+            <div class="row g-3">
+              <div class="col-md-3">
+                <label class="form-label fw-semibold">Year</label>
+                {{ ymm_form.year }}
+              </div>
+              <div class="col-md-3">
+                <label class="form-label fw-semibold">Make</label>
+                {{ ymm_form.make }}
+              </div>
+              <div class="col-md-3">
+                <label class="form-label fw-semibold">Model</label>
+                {{ ymm_form.model }}
+              </div>
+              <div class="col-md-3">
+                <label class="form-label fw-semibold">Trim <span class="text-muted">(optional)</span></label>
+                {{ ymm_form.trim }}
+              </div>
+            </div>
+            <div class="mt-4">
+              <button type="submit" class="btn btn-primary px-5">Search Specs</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIN Search -->
+    <div class="tab-pane fade" id="vin-tab">
+      <div class="card shadow-sm">
+        <div class="card-body p-4">
+          <form method="post" action="{% url 'carspecs:search_vin' %}">
+            {% csrf_token %}
+            <div class="row g-3 align-items-end">
+              <div class="col-md-8">
+                <label class="form-label fw-semibold">Vehicle Identification Number (VIN)</label>
+                {{ vin_form.vin }}
+              </div>
+              <div class="col-md-4">
+                <button type="submit" class="btn btn-primary w-100">Search VIN</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Searches -->
+  {% if recent_searches %}
+  <div class="mt-5">
+    <h5 class="text-muted">Recent Searches</h5>
+    <div class="d-flex flex-wrap gap-2 mt-2">
+      {% for search in recent_searches %}
+        <span class="badge bg-light text-dark border">{{ search }}</span>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

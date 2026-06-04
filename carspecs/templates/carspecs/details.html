@@ -1,0 +1,129 @@
+{% extends 'carspecs/base.html' %}
+
+{% block title %}{{ result.bestMatch.name }} – AutoSpecs{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+
+  <a href="{% url 'carspecs:search_home' %}" class="btn btn-outline-secondary mb-4">← New Search</a>
+
+  {% with car=result.bestMatch %}
+
+  <!-- Hero Card -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-body p-4">
+      <div class="row align-items-center">
+        <div class="col-md-8">
+          <h2 class="fw-bold mb-1">{{ car.make }} {{ car.model }}</h2>
+          <h5 class="text-muted mb-3">{{ car.year }} – {{ car.name }}</h5>
+          <div class="d-flex flex-wrap gap-2">
+            {% if car.is_electric %}
+              <span class="badge bg-success">Electric</span>
+            {% elif car.is_plugin_electric %}
+              <span class="badge bg-info text-dark">Plug-in Hybrid</span>
+            {% endif %}
+            {% if car.is_truck %}
+              <span class="badge bg-secondary">Truck</span>
+            {% endif %}
+            <span class="badge bg-primary">{{ car.total_seating }} Seats</span>
+          </div>
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+          <div class="text-muted small">Base MSRP</div>
+          <div class="fs-3 fw-bold text-success">${{ car.base_msrp|floatformat:0 }}</div>
+          <div class="text-muted small mt-1">Invoice: ${{ car.base_invoice|floatformat:0 }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Colors -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-header fw-semibold">🎨 Colors</div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <h6 class="text-muted">Exterior</h6>
+          <div class="d-flex flex-wrap gap-2">
+            {% for color in car.color.exterior %}
+              <div class="d-flex align-items-center gap-2 border rounded px-2 py-1">
+                <div style="width:20px;height:20px;border-radius:50%;background:rgb({{ color.rgb }});border:1px solid #ccc;"></div>
+                <small>{{ color.name }}</small>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="col-md-6 mt-3 mt-md-0">
+          <h6 class="text-muted">Interior</h6>
+          <div class="d-flex flex-wrap gap-2">
+            {% for color in car.color.interior %}
+              <div class="d-flex align-items-center gap-2 border rounded px-2 py-1">
+                <div style="width:20px;height:20px;border-radius:50%;background:rgb({{ color.rgb }});border:1px solid #ccc;"></div>
+                <small>{{ color.name }}</small>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Standard Features -->
+  <h4 class="fw-bold mb-3">Standard Features</h4>
+  <div class="row row-cols-1 row-cols-md-2 g-4 mb-4">
+    {% for category in car.features.standard %}
+    <div class="col">
+      <div class="card h-100 shadow-sm">
+        <div class="card-header fw-semibold bg-light">{{ category.category }}</div>
+        <ul class="list-group list-group-flush">
+          {% for feature in category.features %}
+          <li class="list-group-item d-flex justify-content-between">
+            <span>{{ feature.name }}</span>
+            {% if feature.value %}
+              <span class="text-muted small">{{ feature.value }}</span>
+            {% endif %}
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Optional Features -->
+  {% if car.features.optional %}
+  <h4 class="fw-bold mb-3">Optional Features & Packages</h4>
+  <div class="row row-cols-1 row-cols-md-2 g-4 mb-4">
+    {% for category in car.features.optional %}
+    <div class="col">
+      <div class="card h-100 shadow-sm">
+        <div class="card-header fw-semibold bg-light">{{ category.category }}</div>
+        <ul class="list-group list-group-flush">
+          {% for feature in category.features %}
+          <li class="list-group-item d-flex justify-content-between">
+            <span>{{ feature.name }}</span>
+            {% if feature.price is not None %}
+              <span class="badge bg-secondary">${{ feature.price }}</span>
+            {% endif %}
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Trim Options -->
+  {% if result.trimOptions %}
+  <h4 class="fw-bold mb-3">Other Available Trims</h4>
+  <div class="d-flex flex-wrap gap-2 mb-4">
+    {% for trim in result.trimOptions %}
+      <span class="badge bg-light text-dark border fs-6">{{ trim }}</span>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% endwith %}
+</div>
+{% endblock %}

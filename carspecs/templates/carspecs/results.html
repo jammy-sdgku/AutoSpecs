@@ -1,0 +1,95 @@
+{% extends 'carspecs/base.html' %}
+
+{% block title %}Results for {{ query }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Results for: <strong>{{ query }}</strong></h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    {% if search_type == 'vin' and vin_data %}
+        <!-- VIN Results -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">{{ vin_data.year }} {{ vin_data.make }} {{ vin_data.model }} {{ vin_data.trim }}</h5>
+            </div>
+            <div class="card-body">
+                <h6 class="text-muted">Vehicle Specs</h6>
+                <div class="row">
+                    {% if specs.body_class %}<div class="col-md-4"><p><strong>Body:</strong> {{ specs.body_class }}</p></div>{% endif %}
+                    {% if specs.vehicle_type %}<div class="col-md-4"><p><strong>Type:</strong> {{ specs.vehicle_type }}</p></div>{% endif %}
+                    {% if specs.drive_type %}<div class="col-md-4"><p><strong>Drive:</strong> {{ specs.drive_type }}</p></div>{% endif %}
+                    {% if specs.doors %}<div class="col-md-4"><p><strong>Doors:</strong> {{ specs.doors }}</p></div>{% endif %}
+                    {% if specs.engine_configuration %}<div class="col-md-4"><p><strong>Engine Config:</strong> {{ specs.engine_configuration }}</p></div>{% endif %}
+                    {% if specs.engine_number_of_cylinders %}<div class="col-md-4"><p><strong>Cylinders:</strong> {{ specs.engine_number_of_cylinders }}</p></div>{% endif %}
+                    {% if specs.displacement_l %}<div class="col-md-4"><p><strong>Displacement:</strong> {{ specs.displacement_l }}L</p></div>{% endif %}
+                    {% if specs.engine_brake_hp_from %}<div class="col-md-4"><p><strong>Horsepower:</strong> {{ specs.engine_brake_hp_from }} HP</p></div>{% endif %}
+                    {% if specs.fuel_type_primary %}<div class="col-md-4"><p><strong>Fuel Type:</strong> {{ specs.fuel_type_primary }}</p></div>{% endif %}
+                    {% if specs.fuel_delivery_fuel_injection_type %}<div class="col-md-4"><p><strong>Fuel Injection:</strong> {{ specs.fuel_delivery_fuel_injection_type }}</p></div>{% endif %}
+                    {% if specs.engine_model %}<div class="col-md-4"><p><strong>Engine Model:</strong> {{ specs.engine_model }}</p></div>{% endif %}
+                    {% if specs.manufacturer_name %}<div class="col-md-4"><p><strong>Manufacturer:</strong> {{ specs.manufacturer_name }}</p></div>{% endif %}
+                    {% if specs.plant_city %}<div class="col-md-4"><p><strong>Plant:</strong> {{ specs.plant_city }}, {{ specs.plant_state }}, {{ specs.plant_country }}</p></div>{% endif %}
+                    {% if specs.front_air_bag_locations %}<div class="col-md-4"><p><strong>Front Airbags:</strong> {{ specs.front_air_bag_locations }}</p></div>{% endif %}
+                    {% if specs.curtain_air_bag_locations %}<div class="col-md-4"><p><strong>Curtain Airbags:</strong> {{ specs.curtain_air_bag_locations }}</p></div>{% endif %}
+                    {% if specs.seat_belt_type %}<div class="col-md-4"><p><strong>Seat Belts:</strong> {{ specs.seat_belt_type }}</p></div>{% endif %}
+                    {% if specs.tire_pressure_monitoring_system_tpms_type %}<div class="col-md-4"><p><strong>TPMS:</strong> {{ specs.tire_pressure_monitoring_system_tpms_type }}</p></div>{% endif %}
+                    {% if specs.gross_vehicle_weight_rating_from %}<div class="col-md-4"><p><strong>GVWR:</strong> {{ specs.gross_vehicle_weight_rating_from }}</p></div>{% endif %}
+                </div>
+            </div>
+        </div>
+
+        {% if trims %}
+        <h5>Available Trims for {{ vin_data.year }} {{ vin_data.make }} {{ vin_data.model }}</h5>
+        <div class="row">
+            {% for trim in trims %}
+            <div class="col-md-6 mb-3">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-secondary text-white">
+                        <h6 class="mb-0">{{ trim.name }}</h6>
+                    </div>
+                    <div class="card-body">
+                        {% if trim.description %}<p><strong>Description:</strong> {{ trim.description }}</p>{% endif %}
+                        {% if trim.msrp %}<p><strong>MSRP:</strong> ${{ trim.msrp|floatformat:0 }}</p>{% endif %}
+                        {% if trim.invoice %}<p><strong>Invoice:</strong> ${{ trim.invoice|floatformat:0 }}</p>{% endif %}
+                        {% if trim.make_model_submodel.submodel %}<p><strong>Submodel:</strong> {{ trim.make_model_submodel.submodel }}</p>{% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+    {% elif search_type == 'ymm' and results %}
+        <!-- YMM Results -->
+        <p class="text-muted">{{ total }} result{{ total|pluralize }} found</p>
+        <div class="row">
+            {% for item in results %}
+            <div class="col-md-6 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0">{{ item.year }} {{ item.make }} {{ item.model }} {{ item.trim }}</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if item.description %}<p><strong>Description:</strong> {{ item.description }}</p>{% endif %}
+                        {% if item.msrp %}<p><strong>MSRP:</strong> ${{ item.msrp|floatformat:0 }}</p>{% endif %}
+                        {% if item.invoice %}<p><strong>Invoice:</strong> ${{ item.invoice|floatformat:0 }}</p>{% endif %}
+                        {% if item.series %}<p><strong>Series:</strong> {{ item.series }}</p>{% endif %}
+                        {% if item.submodel %}<p><strong>Submodel:</strong> {{ item.submodel }}</p>{% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+    {% else %}
+        <div class="alert alert-warning">No results found.</div>
+    {% endif %}
+
+    <a href="{% url 'carspecs:search_home' %}" class="btn btn-secondary mt-3">← New Search</a>
+</div>
+{% endblock %}
