@@ -1,1 +1,1 @@
-web: gunicorn autospecs.wsgi
+web: gunicorn autospecs.wsgi:application
